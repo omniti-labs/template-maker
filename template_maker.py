@@ -54,7 +54,6 @@ for line in pat_fh:
     parts = line.split()
     parts[0] = parts[0].strip('/')
     patterns.append(parts)
-    print parts
 pat_fh.close()
 
 attrs = [] # For the attributes/default.rb file
