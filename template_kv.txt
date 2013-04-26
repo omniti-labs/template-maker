@@ -1,0 +1,5 @@
+# Skip any comments beginning with #
+/^#/ skip
+# Whitespace separated key/values - anything after first whitespace is the
+# value
+/^(\S+)\s+(\S.*)$/ camel_template
