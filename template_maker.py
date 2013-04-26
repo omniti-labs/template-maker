@@ -20,17 +20,21 @@ import argparse
 
 parser = argparse.ArgumentParser(
         description='Automatic chef template generator.')
-parser.add_argument('-p', '--patfile',
+parser.add_argument('-p', '--patfile', required=True,
         help='File containing pattern/action pairs')
-parser.add_argument('-f', '--file',
+parser.add_argument('-f', '--file', required=True,
         help='File to convert to a template')
 parser.add_argument('-o', '--output',
         help='File to output the template to')
-parser.add_argument('-a', '--attrs', default='attrs_default.rb',
+parser.add_argument('-a', '--attrs', default='default.rb',
         help='File to output the chef attribute definitions to')
 parser.add_argument('-ap', '--attrprefix', default='foo',
         help='Prefix to add to attribute default definitions')
 args = parser.parse_args()
+
+# Add some dynamic defaults
+if args.output is None:
+    args.output = "%s.erb" % args.file
 
 def camel_to_underscore(s):
     new_s = []
