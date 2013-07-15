@@ -35,3 +35,7 @@ Templatize sshd_config:
 The same, but for ansible:
 
     ./template_maker.py -p template_kv.txt -f test/sshd_config -t ansible
+
+Running tests:
+
+    python -m doctest [-v] template_maker.py
