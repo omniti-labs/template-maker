@@ -19,22 +19,26 @@ import sys
 import argparse
 
 parser = argparse.ArgumentParser(
-        description='Automatic chef template generator.')
-parser.add_argument('-p', '--patfile', required=True,
-        help='File containing pattern/action pairs')
-parser.add_argument('-f', '--file', required=True,
-        help='File to convert to a template')
-parser.add_argument('-o', '--output',
-        help='File to output the template to')
-parser.add_argument('-a', '--attrs', default='default.rb',
-        help='File to output the chef attribute definitions to')
-parser.add_argument('-ap', '--attrprefix', default='foo',
-        help='Prefix to add to attribute default definitions')
+    description='Automatic chef template generator.')
+parser.add_argument(
+    '-p', '--patfile', required=True,
+    help='File containing pattern/action pairs')
+parser.add_argument(
+    '-f', '--file', required=True, help='File to convert to a template')
+parser.add_argument(
+    '-o', '--output', help='File to output the template to')
+parser.add_argument(
+    '-a', '--attrs', default='default.rb',
+    help='File to output the chef attribute definitions to')
+parser.add_argument(
+    '-ap', '--attrprefix', default='foo',
+    help='Prefix to add to attribute default definitions')
 args = parser.parse_args()
 
 # Add some dynamic defaults
 if args.output is None:
     args.output = "%s.erb" % args.file
+
 
 def camel_to_underscore(s):
     new_s = []
@@ -56,7 +60,7 @@ for line in pat_fh:
     patterns.append(parts)
 pat_fh.close()
 
-attrs = [] # For the attributes/default.rb file
+attrs = []  # For the attributes/default.rb file
 fh = open(args.file)
 ofh = open(args.output, "w")
 for line in fh:
@@ -69,13 +73,13 @@ for line in fh:
                 pass
             elif action == 'template':
                 line = line[:m.start(2)] + '<%%= node[:%s][:%s] %%>' % (
-                        args.attrprefix, m.group(1)) + line[m.end(2):]
+                    args.attrprefix, m.group(1)) + line[m.end(2):]
                 attrs.append((m.group(1), m.group(2)))
             elif action == 'camel_template':
                 # TODO - merge this and the template option
                 line = line[:m.start(2)] + '<%%= node[:%s][:%s] %%>' % (
-                        args.attrprefix, camel_to_underscore(m.group(1))) + \
-                        line[m.end(2):]
+                    args.attrprefix, camel_to_underscore(m.group(1))) + \
+                    line[m.end(2):]
                 attrs.append((camel_to_underscore(m.group(1)), m.group(2)))
             else:
                 print "ERROR: unknown action: %s" % p[1]
