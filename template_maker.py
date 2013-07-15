@@ -14,22 +14,27 @@
 #   template - transform the line - matching group 2 is the value, matching
 #       group
 #   1 is the name
+import os
 import re
 import sys
 import argparse
 
 parser = argparse.ArgumentParser(
-    description='Automatic chef template generator.')
+    description='Automatic erb/jinja2 template generator.')
 parser.add_argument(
     '-p', '--patfile', required=True,
     help='File containing pattern/action pairs')
+parser.add_argument(
+    '-t', '--templatetype', default='chef',
+    choices=['chef', 'ansible'],
+    help='Type of template to generate')
 parser.add_argument(
     '-f', '--file', required=True, help='File to convert to a template')
 parser.add_argument(
     '-o', '--output', help='File to output the template to')
 parser.add_argument(
-    '-a', '--attrs', default='default.rb',
-    help='File to output the chef attribute definitions to')
+    '-a', '--attrs',
+    help='File to output the default variable settings to')
 parser.add_argument(
     '-ap', '--attrprefix', default='foo',
     help='Prefix to add to attribute default definitions')
@@ -37,7 +42,19 @@ args = parser.parse_args()
 
 # Add some dynamic defaults
 if args.output is None:
-    args.output = "%s.erb" % args.file
+    ext = ''
+    if args.templatetype == 'chef':
+        ext = 'erb'
+    elif args.templatetype == 'ansible':
+        ext = 'j2'
+    args.output = "%s.%s" % (args.file, ext)
+if args.attrs is None:
+    args.attrs = 'defaults'
+    if args.templatetype == 'chef':
+        args.attrs = 'default.rb'
+    elif args.templatetype == 'ansible':
+        args.attrs = 'vars.yml'
+    args.attrs = os.path.join(os.path.dirname(args.output), args.attrs)
 
 
 def camel_to_underscore(s):
@@ -49,6 +66,22 @@ def camel_to_underscore(s):
         new_s.append(c.lower())
     return ''.join(new_s)
 
+
+def process_template_line(line, attrs, match, func=None):
+    template_pattern = "$%s%s"  # Stupid default that shouldn't ever be used
+    if args.templatetype == 'chef':
+        template_pattern = '<%%= node[:%s][:%s] %%>'
+    elif args.templatetype == 'ansible':
+        template_pattern = '{{ %s_%s }}'
+
+    if func is None:
+        func = lambda x: x
+    attrs.append((func(match.group(1)), match.group(2)))
+    return line[:match.start(2)] + template_pattern % (
+        args.attrprefix, func(match.group(1))) + line[match.end(2):]
+
+
+# Parse the pattern file
 pat_fh = open(args.patfile)
 patterns = []
 for line in pat_fh:
@@ -60,9 +93,11 @@ for line in pat_fh:
     patterns.append(parts)
 pat_fh.close()
 
+# Now generate the template file
 attrs = []  # For the attributes/default.rb file
 fh = open(args.file)
 ofh = open(args.output, "w")
+
 for line in fh:
     for p in patterns:
         m = re.search(p[0], line)
@@ -72,15 +107,10 @@ for line in fh:
                 # Don't transform the line
                 pass
             elif action == 'template':
-                line = line[:m.start(2)] + '<%%= node[:%s][:%s] %%>' % (
-                    args.attrprefix, m.group(1)) + line[m.end(2):]
-                attrs.append((m.group(1), m.group(2)))
+                line = process_template_line(line, attrs, m)
             elif action == 'camel_template':
-                # TODO - merge this and the template option
-                line = line[:m.start(2)] + '<%%= node[:%s][:%s] %%>' % (
-                    args.attrprefix, camel_to_underscore(m.group(1))) + \
-                    line[m.end(2):]
-                attrs.append((camel_to_underscore(m.group(1)), m.group(2)))
+                line = process_template_line(line, attrs, m,
+                                             camel_to_underscore)
             else:
                 print "ERROR: unknown action: %s" % p[1]
                 sys.exit(1)
@@ -89,7 +119,17 @@ for line in fh:
 fh.close()
 ofh.close()
 
+# Now write out the defaults file
 afh = open(args.attrs, "w")
+
+defaults_pattern = "%s%s = %s\n"  # Stupid default that shouldn't ever be used
+defaults_prefix = ''
+if args.templatetype == 'chef':
+    defaults_pattern = "default[:%s][:%s] = '%s'\n"
+elif args.templatetype == 'ansible':
+    defaults_prefix = '---\n'
+    defaults_pattern = '%s_%s: %s\n'
+afh.write(defaults_prefix)
 for k, v in attrs:
-    afh.write("default[:%s][:%s] = '%s'\n" % (args.attrprefix, k, v))
+    afh.write(defaults_pattern % (args.attrprefix, k, v))
 afh.close()

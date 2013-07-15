@@ -1,4 +1,4 @@
-# Chef template maker
+# Chef/Ansible template maker
 
 This script takes a standard config file, and a set of regular expressions to
 match configuration items, and generates a templated version of the same file
@@ -23,5 +23,15 @@ Currently, the allowed actions are:
 
 For template actions, the pattern must contain two matching groups. The first
 matching group identifies the key that will be used in the chef
-attributes/default.rb file, and the second should surround the value, which
-will be extracted and put in the attributes file.
+attributes/default.rb (or ansible vars) file, and the second should surround
+the value, which will be extracted and put in the attributes file.
+
+## Examples
+
+Templatize sshd_config:
+
+    ./template_maker.py -p template_kv.txt -f test/sshd_config
+
+The same, but for ansible:
+
+    ./template_maker.py -p template_kv.txt -f test/sshd_config -t ansible
