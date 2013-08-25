@@ -20,18 +20,25 @@ def action_template(line, attrs, match, args, options):
     template_pattern = "$%s%s"  # Stupid default that shouldn't ever be used
     if args.templatetype == 'chef':
         template_pattern = '<%%= node[:%s][:%s] %%>'
+        key_separator = '][:'
     elif args.templatetype == 'ansible':
         template_pattern = '{{ %s_%s }}'
+        key_separator = '_'
 
     # Options in this case are various filters you can use on the key name
-    key = match.group(1)
+    keys = match.groups()[:-1]
     for o in options:
         filterfunc = getattr(filters, o, None)
         if filterfunc:
-            key = filterfunc(key)
+            newkeys = []
+            for k in keys:
+                newkeys.append(filterfunc(k))
+            keys = newkeys
         else:
             print "ERROR: unknown filter: %s" % o
             sys.exit(1)
-    attrs.append((key, match.group(2)))
-    return line[:match.start(2)] + template_pattern % (
-        args.attrprefix, key) + line[match.end(2):]
+    last_match = len(match.groups())
+    attrs.append((keys, match.group(last_match)))
+    return line[:match.start(last_match)] + template_pattern % (
+        args.attrprefix, key_separator.join(keys)) + line[
+            match.end(last_match):]

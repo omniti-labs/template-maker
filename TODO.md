@@ -37,11 +37,3 @@
       * Maybe actions should have options allowed also:
         * REGEX template camel multi_array # Array method
         * REGEX template multi_suffix # Var suffix method
- * Nested grouping templates:
-    * `/^(Subsystem)\s+(\S.*)\s+(\S.*)$/ template`
-    * If there are more than two matching groups, the middle matching groups
-      are extra levels of nesting in the variable.
-    * Example:
-      * Subsystem sftp internal-sftp
-      * `default[:foo][:subsystem][:sftp] = 'internal-sftp'
-      * `foo_subsystem_sftp = 'internal-sftp'

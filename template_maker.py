@@ -98,12 +98,15 @@ if __name__ == '__main__':
     # Stupid default that shouldn't ever be used
     defaults_pattern = "%s%s = %s\n"
     defaults_prefix = ''
+    defaults_key_separator = '_'
     if args.templatetype == 'chef':
         defaults_pattern = "default[:%s][:%s] = '%s'\n"
+        defaults_key_separator = "][:"
     elif args.templatetype == 'ansible':
         defaults_prefix = '---\n'
         defaults_pattern = '%s_%s: %s\n'
     afh.write(defaults_prefix)
     for k, v in attrs:
-        afh.write(defaults_pattern % (args.attrprefix, k, v))
+        afh.write(defaults_pattern % (args.attrprefix,
+                                      defaults_key_separator.join(k), v))
     afh.close()

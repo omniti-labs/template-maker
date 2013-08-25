@@ -118,7 +118,7 @@ VersionAddendum <%= node[:foo][:version_addendum] %>
 Banner <%= node[:foo][:banner] %>
 
 # override default of no subsystems
-Subsystem	<%= node[:foo][:subsystem] %>
+Subsystem	sftp	<%= node[:foo][:subsystem][:sftp] %>
 
 # Example of overriding settings on a per-user basis
 #Match User anoncvs
