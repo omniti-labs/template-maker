@@ -18,9 +18,8 @@ ListenAddress ::
 # The default requires explicit activation of protocol 1
 Protocol 2
 
-# HostKey for protocol version 1
+# HostKeys
 HostKey /etc/ssh/ssh_host_key
-# HostKeys for protocol version 2
 HostKey /etc/ssh/ssh_host_rsa_key
 HostKey /etc/ssh/ssh_host_dsa_key
 HostKey /etc/ssh/ssh_host_ecdsa_key

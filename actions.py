@@ -6,17 +6,17 @@ import sys
 import filters
 
 
-def action_skip(line, attrs, match, args, options):
+def action_skip(line, out_lines, attrs, match, args, options):
     """Don't transform the line in any way"""
-    return line
+    out_lines.append({'action': 'skip', 'text': line})
 
 
-def action_delete(line, attrs, match, args, options):
+def action_delete(line, out_lines, attrs, match, args, options):
     """Delete the line from the template"""
-    return None
+    pass
 
 
-def action_template(line, attrs, match, args, options):
+def action_template(line, out_lines, attrs, match, args, options):
     template_pattern = "$%s%s"  # Stupid default that shouldn't ever be used
     if args.templatetype == 'chef':
         template_pattern = '<%%= node[:%s][:%s] %%>'
@@ -38,7 +38,44 @@ def action_template(line, attrs, match, args, options):
             print "ERROR: unknown filter: %s" % o
             sys.exit(1)
     last_match = len(match.groups())
-    attrs[tuple(keys)] = match.group(last_match)
-    return line[:match.start(last_match)] + template_pattern % (
-        args.attrprefix, key_separator.join(keys)) + line[
-            match.end(last_match):]
+    keys = tuple(keys)  # Make keys hashable (usable as a dict key)
+    new_line_start = line[:match.start(last_match)]
+    if keys in attrs:
+        # We have a duplicate key, time to deal with it
+        last_line = out_lines[-1]
+        if last_line['action'] == 'template' and last_line['attr'] == keys:
+            # Great, we just processed a key line, which means we can do this
+            # set of keys as a sequence.
+            del(out_lines[-1])
+            if args.templatetype == 'chef':
+                loop_lines = (
+                    '<%% node[:%s][:%s].each do |i| %%>' % (
+                        args.attrprefix, key_separator.join(keys)),
+                    '%s<%%= i %%>' % new_line_start,
+                    '<% end %>')
+            elif args.templatetype == 'ansible':
+                loop_lines = (
+                    '{%% for i in %s_%s %%}' % (
+                        args.attrprefix, key_separator.join(keys)),
+                    '%s{{ i }}' % new_line_start,
+                    '{% endfor %}')
+            for l in loop_lines:
+                out_lines.append({'action': 'template_loop', 'attr': keys,
+                                  'text': '%s\n' % l})
+            attrs[tuple(keys)] = [attrs[tuple(keys)], match.group(last_match)]
+        elif last_line['action'] == 'template_loop' and \
+                last_line['attr'] == keys:
+            # We don't need to print anything to out_lines, we just need to
+            # append the items to the list
+            attrs[tuple(keys)].append(match.group(last_match))
+        else:
+            print "ERROR: non-consecutive duplicate key '%s'" % ','.join(keys)
+            sys.exit(1)
+    else:
+        # Normal, regular key, we're ok
+        attrs[tuple(keys)] = match.group(last_match)
+        new_line = new_line_start + template_pattern % (
+            args.attrprefix, key_separator.join(keys)) + line[
+                match.end(last_match):]
+        out_lines.append({'action': 'template', 'attr': keys,
+                          'text': new_line})

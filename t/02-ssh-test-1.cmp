@@ -12,18 +12,17 @@
 
 Port <%= node[:foo][:port] %>
 AddressFamily <%= node[:foo][:address_family] %>
-ListenAddress <%= node[:foo][:listen_address] %>
-ListenAddress <%= node[:foo][:listen_address] %>
+<% node[:foo][:listen_address].each do |i| %>
+ListenAddress <%= i %>
+<% end %>
 
 # The default requires explicit activation of protocol 1
 Protocol <%= node[:foo][:protocol] %>
 
-# HostKey for protocol version 1
-HostKey <%= node[:foo][:host_key] %>
-# HostKeys for protocol version 2
-HostKey <%= node[:foo][:host_key] %>
-HostKey <%= node[:foo][:host_key] %>
-HostKey <%= node[:foo][:host_key] %>
+# HostKeys
+<% node[:foo][:host_key].each do |i| %>
+HostKey <%= i %>
+<% end %>
 
 # Lifetime and size of ephemeral version 1 server key
 KeyRegenerationInterval <%= node[:foo][:key_regeneration_interval] %>

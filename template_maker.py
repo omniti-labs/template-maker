@@ -74,8 +74,8 @@ if __name__ == '__main__':
     # Now generate the template file
     attrs = OrderedDict()  # For the attributes/default.rb file
     fh = open(args.file)
-    ofh = open(args.output, "w")
 
+    out_lines = []
     for line in fh:
         for p in patterns:
             m = re.search(p[0], line)
@@ -83,14 +83,19 @@ if __name__ == '__main__':
                 action = p[1]
                 actionfunc = getattr(actions, "action_" + action, None)
                 if actionfunc:
-                    line = actionfunc(line, attrs, m, args, p[2:])
+                    actionfunc(line, out_lines, attrs, m, args, p[2:])
                 else:
                     print "ERROR: unknown action: %s" % p[1]
                     sys.exit(1)
                 break
-        if line is not None:
-            ofh.write(line)
+        else:
+            # No match, copy as is
+            out_lines.append({'action': 'default', 'text': line})
     fh.close()
+
+    ofh = open(args.output, "w")
+    for line in out_lines:
+        ofh.write(line['text'])
     ofh.close()
 
     # Now write out the defaults file
