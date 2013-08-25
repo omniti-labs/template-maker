@@ -16,6 +16,7 @@ import argparse
 
 import actions
 
+
 def parse_args():
     parser = argparse.ArgumentParser(
         description='Automatic erb/jinja2 template generator.')
