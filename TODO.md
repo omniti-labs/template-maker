@@ -1,15 +1,12 @@
 # Items to do
 
  * Tests/examples
-   * Give sample output files for sshd_config and make sure that the script
-     outputs the correct ones
    * Pick some more sample files
      * postgres config?
- * Move actions into functions - makes it easier to make new args:
-    * def transform_pass(line, options)
-    * def transform_template(line, options)
-    * Actions will almost certainly need options
-        * e.g. template camel_to_underscore
+ * Additional filters
+   * underscore_to_camel
+   * uppercase
+   * lowercase
  * Detect duplicate keys and make them into lists
    * Example:
 

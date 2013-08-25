@@ -2,4 +2,4 @@
 /^#/ skip
 # Whitespace separated key/values - anything after first whitespace is the
 # value
-/^(\S+)\s+(\S.*)$/ camel_template
+/^(\S+)\s+(\S.*)$/ template camel_to_underscore

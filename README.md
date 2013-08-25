@@ -17,9 +17,11 @@ matching line.
 Currently, the allowed actions are:
 
  * skip - prints the line unmodified - use this to match commented out lines
- * template - convert the line into a template
- * camel_template - convert the line into a template, and the 'key' value
-   should be converted from CamelCase to underscore_case in the attributes.rb.
+ * template - convert the line into a template. This action can take 'filters'
+   as parameters, which will convert the key used in the vars file
+   appropriately:
+   * camel_to_underscore - the 'key' value should be converted from CamelCase
+     to underscore_case in the attributes.rb.
 
 For template actions, the pattern must contain two matching groups. The first
 matching group identifies the key that will be used in the chef
