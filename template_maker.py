@@ -86,7 +86,8 @@ if __name__ == '__main__':
                     print "ERROR: unknown action: %s" % p[1]
                     sys.exit(1)
                 break
-        ofh.write(line)
+        if line is not None:
+            ofh.write(line)
     fh.close()
     ofh.close()
 

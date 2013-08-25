@@ -7,7 +7,13 @@ import filters
 
 
 def action_skip(line, attrs, match, args, options):
+    """Don't transform the line in any way"""
     return line
+
+
+def action_delete(line, attrs, match, args, options):
+    """Delete the line from the template"""
+    return None
 
 
 def action_template(line, attrs, match, args, options):
