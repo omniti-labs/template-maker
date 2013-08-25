@@ -63,7 +63,7 @@ if __name__ == '__main__':
     patterns = []
     for line in pat_fh:
         line = line.strip()
-        if line[0] == '#':
+        if not line or line[0] == '#':
             continue
         parts = line.split()
         parts[0] = parts[0].strip('/')
