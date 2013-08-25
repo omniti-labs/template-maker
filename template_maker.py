@@ -13,6 +13,7 @@ import os
 import re
 import sys
 import argparse
+from collections import OrderedDict
 
 import actions
 
@@ -71,7 +72,7 @@ if __name__ == '__main__':
     pat_fh.close()
 
     # Now generate the template file
-    attrs = []  # For the attributes/default.rb file
+    attrs = OrderedDict()  # For the attributes/default.rb file
     fh = open(args.file)
     ofh = open(args.output, "w")
 
@@ -106,7 +107,7 @@ if __name__ == '__main__':
         defaults_prefix = '---\n'
         defaults_pattern = '%s_%s: %s\n'
     afh.write(defaults_prefix)
-    for k, v in attrs:
+    for k, v in attrs.items():
         afh.write(defaults_pattern % (args.attrprefix,
                                       defaults_key_separator.join(k), v))
     afh.close()

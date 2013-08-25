@@ -38,7 +38,7 @@ def action_template(line, attrs, match, args, options):
             print "ERROR: unknown filter: %s" % o
             sys.exit(1)
     last_match = len(match.groups())
-    attrs.append((keys, match.group(last_match)))
+    attrs[tuple(keys)] = match.group(last_match)
     return line[:match.start(last_match)] + template_pattern % (
         args.attrprefix, key_separator.join(keys)) + line[
             match.end(last_match):]
