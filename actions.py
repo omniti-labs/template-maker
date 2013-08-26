@@ -6,17 +6,17 @@ import sys
 import filters
 
 
-def action_skip(line, out_lines, attrs, match, args, tmod, options):
+def action_skip(line, out_lines, attrs, match, tmod, options):
     """Don't transform the line in any way"""
     out_lines.append({'action': 'skip', 'text': line})
 
 
-def action_delete(line, out_lines, attrs, match, args, tmod, options):
+def action_delete(line, out_lines, attrs, match, tmod, options):
     """Delete the line from the template"""
     pass
 
 
-def action_template(line, out_lines, attrs, match, args, tmod, options):
+def action_template(line, out_lines, attrs, match, tmod, options):
     # Options in this case are various filters you can use on the key name
     keys = match.groups()[:-1]
     for o in options:
@@ -39,8 +39,7 @@ def action_template(line, out_lines, attrs, match, args, tmod, options):
             # Great, we just processed a key line, which means we can do this
             # set of keys as a sequence.
             del(out_lines[-1])
-            loop_lines = tmod.loop_template_line(new_line_start,
-                                                 args.attrprefix, keys)
+            loop_lines = tmod.loop_template_line(new_line_start, keys)
             for l in loop_lines:
                 out_lines.append({'action': 'template_loop', 'attr': keys,
                                   'text': '%s\n' % l})
@@ -57,7 +56,6 @@ def action_template(line, out_lines, attrs, match, args, tmod, options):
         # Normal, regular key, we're ok
         attrs[tuple(keys)] = match.group(last_match)
         new_line = tmod.regular_template_line(
-            new_line_start, line[match.end(last_match):],
-            args.attrprefix, keys)
+            new_line_start, line[match.end(last_match):], keys)
         out_lines.append({'action': 'template', 'attr': keys,
                           'text': new_line})

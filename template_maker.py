@@ -43,8 +43,9 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    tmod = __import__('templatetype.%s' % args.templatetype,
-                      globals(), locals(), [args.templatetype])
+    tt_module = __import__('templatetype.%s' % args.templatetype,
+                           globals(), locals(), [args.templatetype])
+    tmod = tt_module.TemplateType(args)
     # Set defaults for various args
     if args.output is None:
         args.output = "%s.%s" % (args.file, tmod.template_extension)
@@ -76,7 +77,7 @@ if __name__ == '__main__':
                 action = p[1]
                 actionfunc = getattr(actions, "action_" + action, None)
                 if actionfunc:
-                    actionfunc(line, out_lines, attrs, m, args, tmod, p[2:])
+                    actionfunc(line, out_lines, attrs, m, tmod, p[2:])
                 else:
                     print "ERROR: unknown action: %s" % p[1]
                     sys.exit(1)
@@ -93,5 +94,5 @@ if __name__ == '__main__':
 
     # Now write out the default attributes file
     afh = open(args.attrs, "w")
-    tmod.write_attrs(afh, attrs, args.attrprefix)
+    tmod.write_attrs(afh, attrs)
     afh.close()

@@ -2,28 +2,30 @@
 Ansible template output module
 """
 
-# Output template file extension
-template_extension = 'j2'
 
-# Output vars/atts file name
-attrs_file = 'vars.yml'
+class TemplateType(object):
+    def __init__(self, args):
+        # Output template file extension
+        self.template_extension = 'j2'
+        # Output vars/atts file name
+        self.attrs_file = 'vars.yml'
+        # Key prefix
+        self.prefix = args.attrprefix
 
+    def write_attrs(self, fh, attrs):
+        "Writes the attributes file out"
+        fh.write("---\n")
+        for k, v in attrs.items():
+            fh.write("%s_%s: %s\n" % (self.prefix, '_'.join(k), v))
 
-def write_attrs(fh, attrs, prefix):
-    "Writes the attributes file out"
-    fh.write("---\n")
-    for k, v in attrs.items():
-        fh.write("%s_%s: %s\n" % (prefix, '_'.join(k), v))
+    def regular_template_line(self, line_start, line_end, keys):
+        return line_start + '{{ %s_%s }}' % (
+            self.prefix, '_'.join(keys)) + line_end
 
-
-def regular_template_line(line_start, line_end, prefix, keys):
-    return line_start + '{{ %s_%s }}' % (prefix, '_'.join(keys)) + line_end
-
-
-def loop_template_line(line_start, prefix, keys):
-    """Generate a loop in the template given a list of values"""
-    return (
-        '{%% for i in %s_%s %%}' % (prefix, '_'.join(keys)),
-        '%s{{ i }}' % line_start,
-        '{% endfor %}'
-    )
+    def loop_template_line(self, line_start, keys):
+        """Generate a loop in the template given a list of values"""
+        return (
+            '{%% for i in %s_%s %%}' % (self.prefix, '_'.join(keys)),
+            '%s{{ i }}' % line_start,
+            '{% endfor %}'
+        )
