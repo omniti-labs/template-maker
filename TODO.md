@@ -7,6 +7,9 @@
    * underscore_to_camel
    * uppercase
    * lowercase
+ * Make filters and actions into modules/classes like templatetypes
+ * Better detection of available modules (templatetypes/actions)
+ * Make filters generic and able to be used elsewhere
  * Detect duplicate keys and make them into lists
    * Example:
 
