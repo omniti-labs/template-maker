@@ -9,7 +9,7 @@ template_extension = 'j2'
 attrs_file = 'vars.yml'
 
 
-def write_vars(fh, attrs, prefix):
+def write_attrs(fh, attrs, prefix):
     "Writes the attributes file out"
     fh.write("---\n")
     for k, v in attrs.items():
@@ -17,12 +17,13 @@ def write_vars(fh, attrs, prefix):
 
 
 def regular_template_line(line_start, line_end, prefix, keys):
-    return line_start + '{{ %s_%s }}' % (prefix, '_'.join(keys)), + line_end
+    return line_start + '{{ %s_%s }}' % (prefix, '_'.join(keys)) + line_end
 
 
 def loop_template_line(line_start, prefix, keys):
+    """Generate a loop in the template given a list of values"""
     return (
-        '%% for i in %s_%s %%}' % (prefix, '_'.join(keys)),
+        '{%% for i in %s_%s %%}' % (prefix, '_'.join(keys)),
         '%s{{ i }}' % line_start,
         '{% endfor %}'
     )

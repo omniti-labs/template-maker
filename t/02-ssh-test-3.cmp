@@ -1,0 +1,126 @@
+#	$OpenBSD: sshd_config,v 1.89 2013/02/06 00:20:42 dtucker Exp $
+
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# This sshd was compiled with PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them commented.  Uncommented options override the
+# default value.
+
+Port {{ foo_port }}
+AddressFamily {{ foo_address_family }}
+{% for i in foo_listen_address %}
+ListenAddress {{ i }}
+{% endfor %}
+
+# The default requires explicit activation of protocol 1
+Protocol {{ foo_protocol }}
+
+# HostKeys
+{% for i in foo_host_key %}
+HostKey {{ i }}
+{% endfor %}
+
+# Lifetime and size of ephemeral version 1 server key
+KeyRegenerationInterval {{ foo_key_regeneration_interval }}
+ServerKeyBits {{ foo_server_key_bits }}
+
+# Logging
+# obsoletes QuietMode and FascistLogging
+SyslogFacility {{ foo_syslog_facility }}
+LogLevel {{ foo_log_level }}
+
+# Authentication:
+
+LoginGraceTime {{ foo_login_grace_time }}
+PermitRootLogin {{ foo_permit_root_login }}
+StrictModes {{ foo_strict_modes }}
+MaxAuthTries {{ foo_max_auth_tries }}
+MaxSessions {{ foo_max_sessions }}
+
+RSAAuthentication {{ foo_rsa_authentication }}
+PubkeyAuthentication {{ foo_pubkey_authentication }}
+
+# The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
+# but this is overridden so installations will only check .ssh/authorized_keys
+AuthorizedKeysFile	{{ foo_authorized_keys_file }}
+
+AuthorizedPrincipalsFile {{ foo_authorized_principals_file }}
+
+AuthorizedKeysCommand {{ foo_authorized_keys_command }}
+AuthorizedKeysCommandUser {{ foo_authorized_keys_command_user }}
+
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+RhostsRSAAuthentication {{ foo_rhosts_rsa_authentication }}
+# similar for protocol version 2
+HostbasedAuthentication {{ foo_hostbased_authentication }}
+# Change to yes if you don't trust ~/.ssh/known_hosts for
+ RhostsRSAAuthentication and HostbasedAuthentication
+IgnoreUserKnownHosts {{ foo_ignore_user_known_hosts }}
+# Don't read the user's ~/.rhosts and ~/.shosts files
+IgnoreRhosts {{ foo_ignore_rhosts }}
+
+# To disable tunneled clear text passwords, change to no here!
+PasswordAuthentication {{ foo_password_authentication }}
+PermitEmptyPasswords {{ foo_permit_empty_passwords }}
+
+# Change to no to disable s/key passwords
+ChallengeResponseAuthentication {{ foo_challenge_response_authentication }}
+
+# Kerberos options
+KerberosAuthentication {{ foo_kerberos_authentication }}
+KerberosOrLocalPasswd {{ foo_kerberos_or_local_passwd }}
+KerberosTicketCleanup {{ foo_kerberos_ticket_cleanup }}
+KerberosGetAFSToken {{ foo_kerberos_get_afs_token }}
+
+# GSSAPI options
+GSSAPIAuthentication {{ foo_gssapi_authentication }}
+GSSAPICleanupCredentials {{ foo_gssapi_cleanup_credentials }}
+
+# Set this to 'yes' to enable PAM authentication, account processing, 
+# and session processing. If this is enabled, PAM authentication will 
+# be allowed through the ChallengeResponseAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via ChallengeResponseAuthentication may bypass
+# the setting of "PermitRootLogin without-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and ChallengeResponseAuthentication to 'no'.
+UsePAM {{ foo_use_pam }}
+
+AllowAgentForwarding {{ foo_allow_agent_forwarding }}
+AllowTcpForwarding {{ foo_allow_tcp_forwarding }}
+GatewayPorts {{ foo_gateway_ports }}
+X11Forwarding {{ foo_x11_forwarding }}
+X11DisplayOffset {{ foo_x11_display_offset }}
+X11UseLocalhost {{ foo_x11_use_localhost }}
+PrintMotd {{ foo_print_motd }}
+PrintLastLog {{ foo_print_last_log }}
+TCPKeepAlive {{ foo_tcp_keep_alive }}
+UseLogin {{ foo_use_login }}
+UsePrivilegeSeparation {{ foo_use_privilege_separation }}
+PermitUserEnvironment {{ foo_permit_user_environment }}
+Compression {{ foo_compression }}
+ClientAliveInterval {{ foo_client_alive_interval }}
+ClientAliveCountMax {{ foo_client_alive_count_max }}
+UseDNS {{ foo_use_dns }}
+PidFile {{ foo_pid_file }}
+MaxStartups {{ foo_max_startups }}
+PermitTunnel {{ foo_permit_tunnel }}
+ChrootDirectory {{ foo_chroot_directory }}
+VersionAddendum {{ foo_version_addendum }}
+
+# no default banner path
+Banner {{ foo_banner }}
+
+# override default of no subsystems
+Subsystem	sftp	{{ foo_subsystem_sftp }}
+
+# Example of overriding settings on a per-user basis
+#Match User anoncvs
+#	X11Forwarding no
+#	AllowTcpForwarding no
+#	ForceCommand cvs server
