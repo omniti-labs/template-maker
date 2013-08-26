@@ -39,25 +39,18 @@ def parse_args():
         '-ap', '--attrprefix', default='foo',
         help='Prefix to add to attribute default definitions')
     args = parser.parse_args()
-    # Add some dynamic defaults
-    if args.output is None:
-        ext = ''
-        if args.templatetype == 'chef':
-            ext = 'erb'
-        elif args.templatetype == 'ansible':
-            ext = 'j2'
-        args.output = "%s.%s" % (args.file, ext)
-    if args.attrs is None:
-        args.attrs = 'defaults'
-        if args.templatetype == 'chef':
-            args.attrs = 'default.rb'
-        elif args.templatetype == 'ansible':
-            args.attrs = 'vars.yml'
-        args.attrs = os.path.join(os.path.dirname(args.output), args.attrs)
     return args
 
 if __name__ == '__main__':
     args = parse_args()
+    tmod = __import__('templatetype.%s' % args.templatetype,
+                      globals(), locals(), [args.templatetype])
+    # Set defaults for various args
+    if args.output is None:
+        args.output = "%s.%s" % (args.file, tmod.template_extension)
+    if args.attrs is None:
+        args.attrs = os.path.join(os.path.dirname(args.output),
+                                  tmod.attrs_file)
 
     # Parse the pattern file
     pat_fh = open(args.patfile)
@@ -83,7 +76,7 @@ if __name__ == '__main__':
                 action = p[1]
                 actionfunc = getattr(actions, "action_" + action, None)
                 if actionfunc:
-                    actionfunc(line, out_lines, attrs, m, args, p[2:])
+                    actionfunc(line, out_lines, attrs, m, args, tmod, p[2:])
                 else:
                     print "ERROR: unknown action: %s" % p[1]
                     sys.exit(1)
@@ -98,21 +91,7 @@ if __name__ == '__main__':
         ofh.write(line['text'])
     ofh.close()
 
-    # Now write out the defaults file
+    # Now write out the default attributes file
     afh = open(args.attrs, "w")
-
-    # Stupid default that shouldn't ever be used
-    defaults_pattern = "%s%s = %s\n"
-    defaults_prefix = ''
-    defaults_key_separator = '_'
-    if args.templatetype == 'chef':
-        defaults_pattern = "default[:%s][:%s] = '%s'\n"
-        defaults_key_separator = "][:"
-    elif args.templatetype == 'ansible':
-        defaults_prefix = '---\n'
-        defaults_pattern = '%s_%s: %s\n'
-    afh.write(defaults_prefix)
-    for k, v in attrs.items():
-        afh.write(defaults_pattern % (args.attrprefix,
-                                      defaults_key_separator.join(k), v))
+    tmod.write_attrs(afh, attrs, args.attrprefix)
     afh.close()
