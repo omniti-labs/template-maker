@@ -1,25 +1,20 @@
-"""
-Filters that can be applied to various parts of the template keys
-"""
-
-
-def camel_to_underscore(s):
+def filter(s):
     """
     Converts CamelCase to underscore_case
 
-    >>> camel_to_underscore("AnExample")
+    >>> filter("AnExample")
     'an_example'
-    >>> camel_to_underscore("RSAAuthentication")
+    >>> filter("RSAAuthentication")
     'rsa_authentication'
-    >>> camel_to_underscore("RhostsRSAAuthentication")
+    >>> filter("RhostsRSAAuthentication")
     'rhosts_rsa_authentication'
-    >>> camel_to_underscore("X11Forwarding")
+    >>> filter("X11Forwarding")
     'x11_forwarding'
-    >>> camel_to_underscore("TestExampleABC")
+    >>> filter("TestExampleABC")
     'test_example_abc'
-    >>> camel_to_underscore("TestExampleA")
+    >>> filter("TestExampleA")
     'test_example_a'
-    >>> camel_to_underscore("ATestExample")
+    >>> filter("ATestExample")
     'a_test_example'
     """
     new_s = []

@@ -20,15 +20,21 @@ def action_template(line, out_lines, attrs, match, tmod, options):
     # Options in this case are various filters you can use on the key name
     keys = match.groups()[:-1]
     for o in options:
-        filterfunc = getattr(filters, o, None)
-        if filterfunc:
-            newkeys = []
-            for k in keys:
-                newkeys.append(filterfunc(k))
-            keys = newkeys
-        else:
+        try:
+            # Get the module for the filter, automatically importing it on
+            # demand if it isn't already.
+            mod = getattr(
+                filters, o,
+                __import__('filters.%s' % o, globals(), locals()))
+        except ImportError:
+            # The automatic import failed
             print "ERROR: unknown filter: %s" % o
             sys.exit(1)
+        newkeys = []
+        for k in keys:
+            # Filter modules have a single function called 'filter'
+            newkeys.append(mod.filter(k))
+        keys = newkeys
     last_match = len(match.groups())
     keys = tuple(keys)  # Make keys hashable (usable as a dict key)
     new_line_start = line[:match.start(last_match)]
