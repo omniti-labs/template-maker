@@ -13,19 +13,16 @@ TOTAL_TESTS=
 
 run_doctests() {
     DIR=$1
-    cd $DIR
-    FILES=*.py
+    FILES=$DIR/*.py
     for f in $FILES; do
         python -m doctest $f
-        assert_ran_ok "Python doctests - $DIR/$f"
+        assert_ran_ok "Python doctests - $f"
     done
-    cd - > /dev/null
 }
 
 cd ..
 run_doctests .
-run_doctests filter
-run_doctests action
+run_doctests filters
 run_doctests templatetype
 
 # Print results
