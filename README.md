@@ -32,6 +32,8 @@ Currently, the allowed actions are:
    appropriately:
    * camel_to_underscore - the 'key' value should be converted from CamelCase
      to underscore_case in the attributes.rb.
+   * underscore_to_camel - the reverse of camel_to_underscore, if you prefer
+     your keys to be in CamelCase.
 
 For template actions, the pattern must contain two matching groups. The first
 matching group identifies the key that will be used in the chef
