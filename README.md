@@ -44,12 +44,12 @@ the value, which will be extracted and put in the attributes file.
 
 Templatize sshd_config:
 
-    ./template_maker.py -p template_kv.txt -f test/sshd_config
+    ./template_maker.py -p examples/sshd_config/kv.txt \
+        -f examples/sshd_config/sshd_config -ap sshd
 
 The same, but for ansible:
 
-    ./template_maker.py -p template_kv.txt -f test/sshd_config -t ansible
+    ./template_maker.py -p examples/sshd_config/kv.txt \
+        -f examples/sshd_config/sshd_config -ap sshd -t ansible
 
-Running tests:
-
-    python -m doctest [-v] template_maker.py
+Output files will end up in the examples/sshd_config directory.

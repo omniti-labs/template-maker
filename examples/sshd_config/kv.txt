@@ -1,0 +1,9 @@
+# Skip any comments beginning with #
+/^#/ skip
+
+# Special nested match for ssh subsystem
+/^(Subsystem)\s+(\S.*)\s+(\S.*)$/ template camel_to_underscore
+
+# Whitespace separated key/values - anything after first whitespace is the
+# value
+/^(\S+)\s+(\S.*)$/ template camel_to_underscore
