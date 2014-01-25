@@ -7,8 +7,8 @@ class TemplateType(object):
     def __init__(self, args):
         # Output template file extension
         self.template_extension = 'j2'
-        # Output vars/atts file name
-        self.attrs_file = 'vars.yml'
+        # Default vars/attrs file name
+        self.attrs_file = 'main.yml'
         # Key prefix
         self.prefix = args.attrprefix
 
