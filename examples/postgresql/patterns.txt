@@ -1,0 +1,6 @@
+# Skip any comments beginning with #
+/^#/ skip
+
+# Equals separated key/values
+/^(\S+)\s+=\s+'([^']*)'/ template
+/^(\S+)\s+=\s+(\S+)/ template

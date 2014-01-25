@@ -44,12 +44,17 @@ the value, which will be extracted and put in the attributes file.
 
 Templatize sshd_config:
 
-    ./template_maker.py -p examples/sshd_config/kv.txt \
+    ./template_maker.py -p examples/sshd_config/patterns.txt \
         -f examples/sshd_config/sshd_config -ap sshd
 
 The same, but for ansible:
 
-    ./template_maker.py -p examples/sshd_config/kv.txt \
+    ./template_maker.py -p examples/sshd_config/patterns.txt \
         -f examples/sshd_config/sshd_config -ap sshd -t ansible
 
-Output files will end up in the examples/sshd_config directory.
+Postgresql.conf example:
+
+    ./template_maker.py -p examples/postgresql/patterns.txt \
+        -f examples/postgresql/postgresql.conf -ap pgsql
+
+Output files will end up in the examples directory next to the raw config file.
