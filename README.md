@@ -1,11 +1,21 @@
 # Chef/Ansible template maker
 
-This script takes a standard config file, and a set of regular expressions to
+A common pattern when creating templates for configuration management systems
+is to copy the config file, and add placeholders for each value you want to
+be able to configure. A problem arises however when you decide that some value
+that was hardcoded now needs to be configurable, and you need to edit the
+template. One way to prevent this situation is to templatize every possible
+configuration variable in a file at the outset, but this is incredibly time
+consuming and rarely done. This script is an attempt to speed up that
+procedure for some types of configuration files, and in the ideal case, fully
+automate the process of making a template from a configuration file.
+
+The script takes a standard config file, and a set of regular expressions to
 match configuration items, and generates a templated version of the same file
-along with a companion attributes/default.rb file to drop into a cookbook. It
-works best with configuration files that consist of large amounts of key/value
-pairs, but will work with anything that you can match using regular
-expressions.
+along with a companion attributes/default.rb file to drop into a cookbook
+(defaults/main.yml for ansible). It works best with configuration files that
+consist of large amounts of key/value pairs, but will work with anything that
+you can match using regular expressions.
 
 ## Pattern file
 
