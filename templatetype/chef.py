@@ -15,7 +15,9 @@ class TemplateType(object):
     def write_attrs(self, fh, attrs):
         "Writes the attributes file out"
         for k, v in attrs.items():
-            fh.write("default[:%s][:%s] = '%s'\n" % (
+            if isinstance(v, basestring):
+                v = "'%s'" % v
+            fh.write("default[:%s][:%s] = %s\n" % (
                 self.prefix, '][:'.join(k), v))
 
     def regular_template_line(self, line_start, line_end, keys):
